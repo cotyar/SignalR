@@ -39,18 +39,17 @@ try {
         }
     }
 
-    // REVIEW: For testing. Will uncomment this when I verify that the CI fails properly.
-    // // We use the launchers themselves to figure out if the browser exists. It's a bit sneaky, but it works.
-    // tryAddBrowser("ChromeHeadlessNoSandbox", new ChromeHeadlessBrowser(() => { }, {}));
-    // tryAddBrowser("ChromiumHeadless", new ChromiumHeadlessBrowser(() => { }, {}));
-    // tryAddBrowser("FirefoxHeadless", new FirefoxHeadlessBrowser(0, () => { }, {}));
+    // We use the launchers themselves to figure out if the browser exists. It's a bit sneaky, but it works.
+    tryAddBrowser("ChromeHeadlessNoSandbox", new ChromeHeadlessBrowser(() => { }, {}));
+    tryAddBrowser("ChromiumHeadless", new ChromiumHeadlessBrowser(() => { }, {}));
+    tryAddBrowser("FirefoxHeadless", new FirefoxHeadlessBrowser(0, () => { }, {}));
 
-    // // We need to receive an argument from the caller, but globals don't seem to work, so we use an environment variable.
-    // if (process.env.ASPNETCORE_SIGNALR_TEST_ALL_BROWSERS === "true") {
-    //     tryAddBrowser("Edge", new EdgeBrowser(() => { }, { create() { } }));
-    //     tryAddBrowser("IE", new IEBrowser(() => { }, { create() { } }, {}));
-    //     tryAddBrowser("Safari", new SafariBrowser(() => { }, {}));
-    // }
+    // We need to receive an argument from the caller, but globals don't seem to work, so we use an environment variable.
+    if (process.env.ASPNETCORE_SIGNALR_TEST_ALL_BROWSERS === "true") {
+        tryAddBrowser("Edge", new EdgeBrowser(() => { }, { create() { } }));
+        tryAddBrowser("IE", new IEBrowser(() => { }, { create() { } }, {}));
+        tryAddBrowser("Safari", new SafariBrowser(() => { }, {}));
+    }
 
     module.exports = createKarmaConfig({
         browsers,
