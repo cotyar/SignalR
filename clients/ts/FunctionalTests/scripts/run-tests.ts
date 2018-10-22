@@ -120,6 +120,8 @@ for (let i = 2; i < process.argv.length; i += 1) {
     }
 }
 
+const CI = process.env.CI === "true";
+
 const configFile = sauce ?
     path.resolve(__dirname, "karma.sauce.conf.js") :
     path.resolve(__dirname, "karma.local.conf.js");
@@ -178,8 +180,14 @@ function runJest(url: string) {
     try {
         // Check if we got any browsers
         if (config.browsers.length === 0) {
-            console.log("Unable to locate any suitable browsers. Skipping browser functional tests.");
-            process.exit(0);
+            if (CI) {
+                // Fail if we have no browsers on CI
+                console.error("Unable to find a suitable browser. Browser tests MUST run on CI!");
+                process.exit(1);
+            } else {
+                console.log("Unable to locate any suitable browsers. Skipping browser functional tests.");
+                process.exit(0);
+            }
             return; // For good measure
         }
 

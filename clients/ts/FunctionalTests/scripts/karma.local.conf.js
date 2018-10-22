@@ -15,52 +15,53 @@ try {
     let browsers = [];
 
     function browserExists(path) {
-      // On linux, the browsers just return the command, not a path, so we need to check if it exists.
-      if (process.platform === "linux") {
-        return !!which.sync(path, { nothrow: true });
-      } else {
-        return fs.existsSync(path);
-      }
+        // On linux, the browsers just return the command, not a path, so we need to check if it exists.
+        if (process.platform === "linux") {
+            return !!which.sync(path, { nothrow: true });
+        } else {
+            return fs.existsSync(path);
+        }
     }
 
     function tryAddBrowser(name, b) {
-      var path = b.DEFAULT_CMD[process.platform];
-      if (b.ENV_CMD && process.env[b.ENV_CMD]) {
-        path = process.env[b.ENV_CMD];
-      }
-      console.log(`Checking for ${name} at ${path}...`);
+        var path = b.DEFAULT_CMD[process.platform];
+        if (b.ENV_CMD && process.env[b.ENV_CMD]) {
+            path = process.env[b.ENV_CMD];
+        }
+        console.log(`Checking for ${name} at ${path}...`);
 
-      if (path && browserExists(path)) {
-        console.log(`Located ${name} at ${path}.`);
-        browsers.push(name);
-      }
-      else {
-        console.log(`Unable to locate ${name}. Skipping.`);
-      }
+        if (path && browserExists(path)) {
+            console.log(`Located ${name} at ${path}.`);
+            browsers.push(name);
+        }
+        else {
+            console.log(`Unable to locate ${name}. Skipping.`);
+        }
     }
 
-    // We use the launchers themselves to figure out if the browser exists. It's a bit sneaky, but it works.
-    tryAddBrowser("ChromeHeadlessNoSandbox", new ChromeHeadlessBrowser(() => { }, {}));
-    tryAddBrowser("ChromiumHeadless", new ChromiumHeadlessBrowser(() => { }, {}));
-    tryAddBrowser("FirefoxHeadless", new FirefoxHeadlessBrowser(0, () => { }, {}));
+    // REVIEW: For testing. Will uncomment this when I verify that the CI fails properly.
+    // // We use the launchers themselves to figure out if the browser exists. It's a bit sneaky, but it works.
+    // tryAddBrowser("ChromeHeadlessNoSandbox", new ChromeHeadlessBrowser(() => { }, {}));
+    // tryAddBrowser("ChromiumHeadless", new ChromiumHeadlessBrowser(() => { }, {}));
+    // tryAddBrowser("FirefoxHeadless", new FirefoxHeadlessBrowser(0, () => { }, {}));
 
-    // We need to receive an argument from the caller, but globals don't seem to work, so we use an environment variable.
-    if (process.env.ASPNETCORE_SIGNALR_TEST_ALL_BROWSERS === "true") {
-      tryAddBrowser("Edge", new EdgeBrowser(() => { }, { create() { } }));
-      tryAddBrowser("IE", new IEBrowser(() => { }, { create() { } }, {}));
-      tryAddBrowser("Safari", new SafariBrowser(() => { }, {}));
-    }
+    // // We need to receive an argument from the caller, but globals don't seem to work, so we use an environment variable.
+    // if (process.env.ASPNETCORE_SIGNALR_TEST_ALL_BROWSERS === "true") {
+    //     tryAddBrowser("Edge", new EdgeBrowser(() => { }, { create() { } }));
+    //     tryAddBrowser("IE", new IEBrowser(() => { }, { create() { } }, {}));
+    //     tryAddBrowser("Safari", new SafariBrowser(() => { }, {}));
+    // }
 
     module.exports = createKarmaConfig({
-      browsers,
-      customLaunchers: {
-        ChromeHeadlessNoSandbox: {
-          base: 'ChromeHeadless',
+        browsers,
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: 'ChromeHeadless',
 
-          // ChromeHeadless runs about 10x slower on Windows 7 machines without the --proxy switches below. Why? ¯\_(ツ)_/¯
-          flags: ["--no-sandbox", "--proxy-server='direct://'", "--proxy-bypass-list=*"]
-        }
-      },
+                // ChromeHeadless runs about 10x slower on Windows 7 machines without the --proxy switches below. Why? ¯\_(ツ)_/¯
+                flags: ["--no-sandbox", "--proxy-server='direct://'", "--proxy-bypass-list=*"]
+            }
+        },
     });
 } catch (e) {
     console.error(e);
